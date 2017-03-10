@@ -1,5 +1,10 @@
 # dev-proxy
-Yeah, its the help text just dumped out.
+
+### Installation
+
+I highly recommend you install it globally. `npm install -g`. Afterwards it can be accessed using the `dproxy` command
+
+### Help text
 ```
   Usage: dproxy [options] <remote_host>
 
