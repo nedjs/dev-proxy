@@ -9,7 +9,8 @@
     "errorhandler": "1.5.0",
     "colors": "1.1.2",
     "node-env-file": "0.1.4",
-    "serve-index": "1.6.0"
+    "serve-index": "1.6.0",
+    "nanomatch": "^1.0.2"
   },
   "preferGlobal": "true",
   "main": "./bin/dproxy",
