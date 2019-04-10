@@ -8,21 +8,23 @@ I highly recommend you install it globally. `npm install -g`. Afterwards it can 
 ```
   Usage: dproxy [options] <remote_host>
 
-  Runs a local server which servers static content. If content does not exist or requests are made to the server which do not resolve to static content then the request is resolved using a remote server as specified.Requests are attempted to be resolved in the following
-order REGEX -> MAP -> LOCAL -> REMOTE
+  Runs a local server which servers static content. If content does not exist or requests are made to the server which do not resolve to static content then the request is resolved using a remote server as specified.Requests are attempted to be resolved in the following order REGEX -> MAP -> LOCAL -> REMOTE
 
   Options:
 
-    -h, --help                  output usage information
     -V, --version               output the version number
-    -p, --port <port>           Port for local server to run on - defaults to 3333
+    -t, --test                  I added some local stuff not checked in, feature flag!
+    -p, --port <port>           Port for local server to run on - defaults to 3333 (default: 3333)
     -s, --secure                Add support for HTTP->HTTPS secure connection - defaults to false
-    -d, --dir <path>            Server directory - defaults to ./
+    -d, --dir <path>            Server directory - defaults to ./ (default: ./)
+    --cors                      Forcably overwrite CORS headers when XHR requests are detected. This will always allow full access to requested domai.
+    --handler <path>            Javascript proxy handler file, use template: module.exports = { onRequest: function(request, response) {}, onResponse: function(request, response) {} } (default: null)
     -z, --compress              Add support for compression - defaults to true
     -r, --regex <expression>    Sends requests to the proxied domain if they match the expression without looking locally
-    -m, --map <remote>,<local>  Maps a remote request to a local path. May be specified multiple times. If the local path is relative then it will be resolved to the <dir> param. Remote paths are not required to specify a leading '/' to be matched.
-    -l, --logLevel [level]      Logging levels are as follows: 0=off 1=all 2=messages 4=REGEX 8=MAP 16=LOCAL 32=REMOTE. Levels are bit masked so you can use any combination. EG: 14=messages,REGEX,MAP - Defaults to 46 which is everything but LOCAL
+    -m, --map <remote>,<local>  Maps a remote request to a local path. Remote path is expected to be a glob matching, eg: (static/*.txt).May be specified multiple times. If the local path is relative then it will be resolved to the <dir> param. Remote paths are not required to specify a leading '/' to be matched. (default: )
+    -l, --logLevel [level]      Logging levels are as follows: 0=off 1=all 2=messages 4=REGEX 8=MAP 16=LOCAL 32=REMOTE. Levels are bit masked so you can use any combination. EG: 14=messages,REGEX,MAP - Defaults to 46 which is everything but LOCAL (default: 46)
     --no-color                  Removes color from the output
+    -h, --help                  output usage information
 ```
 
 ### Basic command: 
@@ -52,6 +54,32 @@ mkdir -p public/js
 echo 'window.alert("hello world");' > public/js/scripts.js
 dproxy myhost.com
 ```
+
+
+-------
+
+### Using a handler file
+
+Handler files can be handy for customizing requests and responses. Most basic example of a handler file is:
+
+```javascript
+let requestIndex = 0;
+module.exports = {
+	onRequest: (request, response) => {
+		response['MyCustomIdentifier'] = ++requestIndex;
+		console.log('Requested ' + request.url + " " + response['MyCustomIdentifier']);
+	},
+
+	onResponse: (request, response) => {
+		console.log('Finished ' + request.url + " " + response['MyCustomIdentifier']);
+	}
+}
+```
+
+This prints a request and response with incrementing a request index. Invoke using
+
+`dproxy stackoverflow.com -s --handler my-handler.js`
+ 
 
 -------
 
