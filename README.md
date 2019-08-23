@@ -65,14 +65,41 @@ Handler files can be handy for customizing requests and responses. Most basic ex
 ```javascript
 let requestIndex = 0;
 module.exports = {
-	onRequest: (request, response) => {
-		response['MyCustomIdentifier'] = ++requestIndex;
-		console.log('Requested ' + request.url + " " + response['MyCustomIdentifier']);
-	},
+    /**
+    * Prior to a request being sent to the remote server this function is invoked allowing
+    * you to modify the request or responses.
+    * 
+    * @param proxyRequest The outgoing proxy request to the remote server
+    * @param request The request of the local server
+    * @param response The response of the local server
+    */
+    onProxyRequest: (proxyRequest, request, response) => {
+        response['MyCustomIdentifier'] = ++requestIndex;
+        console.log(`Requested ${request.url} ${response['MyCustomIdentifier']}`);
+    },
 
-	onResponse: (request, response) => {
-		console.log('Finished ' + request.url + " " + response['MyCustomIdentifier']);
-	}
+    /**
+    * A method to modify the response from a proxied server response prior to it being
+    * sent to the local servers response.
+    * 
+    * @param proxyResponse The response from the remote server
+    * @param request The request of the local server
+    * @param response The response of the local server
+    */
+    onProxyResponse: (proxyResponse, request, response) => {
+        console.log(`Finished ${request.url} ${response['MyCustomIdentifier']}`);
+    },
+	
+    /**
+    * Global middleware for all incoming requests and responses on the local server.
+    * @param req Request object provided by Express
+    * @param res Response object provided by Express
+    * @param next Function to continue execution.
+    */  
+    middleware: (req, res, next) => {
+        next();
+        console.log(`request was handled by ${req.handledBy} using ${req.handledUsing}`)
+    }
 }
 ```
 
@@ -80,6 +107,13 @@ This prints a request and response with incrementing a request index. Invoke usi
 
 `dproxy stackoverflow.com -s --handler my-handler.js`
  
+ Additionally you can see what each request was handled by uing the `handledBy` and `handledUsing` properties 
+ on the `request` object. They will be of the following values
+ 
+    handledBy = "proxy" | "local"
+    handledUsing = "proxy" | "fs" | "map" | "regex"
+    
+Note that "proxy" only is handled using "proxy" as the rest are ways of locally resolving requests.
 
 -------
 
