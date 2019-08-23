@@ -55,6 +55,20 @@ echo 'window.alert("hello world");' > public/js/scripts.js
 dproxy myhost.com
 ```
 
+-------
+
+### Request handling priority
+
+Each request send to the local server is sent through a series of handlers which may take the request.
+The order of the handlers is as follows:
+
+
+- **Handler file** - `--handler <path>` specifically the `middleware` function.
+- **RegExp** - `-r, --regex <expression> ` when a request url matches the expression it is sent to the remote ignoring any local files
+- **Map** - `-m, --map <remote>,<local>` maps a remote url to a local file
+- **Local filesystem** - uses the current working directory to attempt to locate the request path and resolves if it exists
+- **Proxy** - The final catch-all which will invoke the same request to the remote server and pipe the response.
+
 
 -------
 
@@ -112,8 +126,6 @@ This prints a request and response with incrementing a request index. Invoke usi
  
     handledBy = "proxy" | "local"
     handledUsing = "proxy" | "fs" | "map" | "regex"
-    
-Note that "proxy" only is handled using "proxy" as the rest are ways of locally resolving requests.
 
 -------
 
