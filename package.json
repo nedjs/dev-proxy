@@ -6,7 +6,7 @@
     "commander": "2.16.x",
     "cors": "^2.8.5",
     "errorhandler": "1.5.0",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "http-proxy": "1.17.0",
     "nanomatch": "^1.0.2",
     "node-env-file": "0.1.8",
